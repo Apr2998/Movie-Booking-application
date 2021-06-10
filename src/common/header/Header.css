@@ -3,7 +3,7 @@
   height: 36px;
   padding: 8px 32px 8px 16px;
 }
-img{
+#logo{
   height: 35px;
   background-color: #ff7f7f;
   -webkit-animation: spin 2s linear infinite;
