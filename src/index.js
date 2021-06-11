@@ -2,10 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import Home from './screens/home/Home';
+import { BrowserRouter, Route } from 'react-router-dom';
+import Details from './screens/details/Details';
 
 ReactDOM.render(
   <>
-  <Home />
+  <BrowserRouter>
+    <Route path="/" component={Home} exact />
+    <Route path="/details" component={Details} />
+  </BrowserRouter>
 </>,
   document.getElementById('root')
 );
