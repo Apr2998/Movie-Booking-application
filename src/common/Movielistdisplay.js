@@ -18,8 +18,6 @@ const useStyles = makeStyles((theme) => ({
     gridList: {
         width: 1000,
         gridGap: 10,
-
-
     },
 
 }));
