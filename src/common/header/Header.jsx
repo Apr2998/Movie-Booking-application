@@ -1,15 +1,15 @@
-import React from 'react';
 import './Header.css';
+import React, { Component } from 'react';
+import logo from '../../assets/logo.svg';
 
-class Header extends React.Component{
-    render(){
-        return(
-            <div className="headerCSS">
-            <img id='logo' src="https://cdn.upgrad.com/uploads/production/286e1f11-1897-4d0c-ab0f-6b2bfc1ce642/logo.svg"></img>
-            </div>
-        )
+class Header extends Component {
+    render() { 
+
+        const size = { width : 15 , height :35}
+        return ( <div className="header">
+            <img style={size} src={logo} className="App-logo" alt="logo" />
+        </div> );
     }
 }
-
-
-export default Header; 
+ 
+export default Header;

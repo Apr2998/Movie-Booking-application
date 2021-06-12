@@ -1,297 +1,229 @@
-import React, { useEffect } from "react";
-import "./Home.css";
-import Header from "../../common/header/Header";
-import GridListBanner from "../../common/GridListBanner";
-import { makeStyles } from '@material-ui/core/styles';
+import React, { Component } from 'react';
+import Header from '../../common/header/Header'
+import './Home.css'
+import ReactDOM from 'react-dom';
+
+import { withStyles } from '@material-ui/core/styles';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
+
+import moviesData from "../../common/moviesData.js";
+import Details from '../details/Details.js';
+
 import Card from '@material-ui/core/Card';
-import TextField from '@material-ui/core/TextField';
+import CardContent from '@material-ui/core/CardContent';
 import FormControl from '@material-ui/core/FormControl';
-import Input from '@material-ui/core/Input';
+import Typography from '@material-ui/core/Typography';
 import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListItemText from '@material-ui/core/ListItemText';
+import Input from '@material-ui/core/Input';
 import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import Checkbox from '@material-ui/core/Checkbox';
+import ListItemText from '@material-ui/core/ListItemText';
+import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import { Link } from "react-router-dom";
 
-import moviesData from "../../common/moviesData";
-import genre from "../../common/genre";
+
 import artists from "../../common/artists";
+import genres from "../../common/genre";
 
-
-class Home extends React.Component {
-    
-
-    constructor(props) {
-        super(props);
-        this.state = { movies: [], searchTerm: '' };
-    }
-
-    componentDidMount() {
-        this.setState({ movies: moviesData })
-    }
-
-    setSearch(search) {
-        this.setState({ searchTerm: search })
-    }
-
-
-    handleSubmit(artistName, genres) {
-        // console.log(artistName, genres);
-
-        this.setState({
-            movies: moviesData.filter(m => {
-                console.log("check", m.artists.find((a) => artistName.includes(a.first_name)));
-
-                return (m.artists.find((a) => artistName.includes(a.first_name)) !== undefined || m.title.toLowerCase().includes(this.state.searchTerm))
-            })
-        })
-        console.log("checking", this.movies);
-    }
-
-    render() {
-
-        // console.log(this.state)
-
-        return (
-            <div>
-                <Header />
-                <div className="a">
-                    <span>Upcoming Movies</span>
-                </div>
-                <GridListBanner />
-                <div className="flex-container">
-                    <div className="left">
-                        <Movielistdisplay movies={this.state.movies} />
-                    </div>
-                    <div className="right">
-                    <MovieFilter setSearch={this.setSearch.bind(this)} handleSubmit={this.handleSubmit.bind(this)} movies={this.state.movies} />
-                    </div>
-                </div>
-
-
-            </div>
-        );
-    }
-}
-
-
-
-
-
-
-
-
-// -------------------------------movies list-----------------------------------------------------------
-//------------------------------------------------------------------------------------------------------
-// -------------------------------movies list-----------------------------------------------------------
-
-
-const styleForMovies = makeStyles((theme) => ({
+const styles = theme => ({
     root: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-        overflow: 'hidden',
+        flexGrow: 1,
         backgroundColor: theme.palette.background.paper,
     },
-    gridList: {
-        width: 1000,
+    gridListUpcomingMovies: {
+        flexWrap: 'nowrap',
+        transform: 'translateZ(0)',
+        width: '100%'
     },
-
-}));
-
-
-export function Movielistdisplay({ movies }) {
-    const classess = styleForMovies();
-
-    return (
-        <div className={classess.root}>
-            <GridList cellHeight={350} className={classess.gridList} cols={4}>
-                <GridListTile key="Subheader" cols={4} style={{ height: 'auto' }}>
-
-                </GridListTile>
-                
-                {movies.map((tile) => (
-                    <GridListTile key={tile.poster_url}>
-                        <Link to={`/details/${tile.id}`}><img src={tile.poster_url} alt={tile.title} style={{ cursor: 'pointer' }} /></Link>
-                        <GridListTileBar
-                            title={tile.title}
-                            subtitle={<span>{tile.release_date}</span>}
-
-                        />
-                    </GridListTile>
-                ))}
-            </GridList>
-        </div>
-    );
-}
-
-
-
-
-
-
-// ----------------------filter list apply -----------------------------------------------------------------
-// ----------------------filter list apply -----------------------------------------------------------------
-
-
-
-
-
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-
-        margin: theme.spacing.unit,
+    formControl: {
+        margin: theme.spacing(1),
         minWidth: 240,
-        maxWidth: 240,
-
+        maxWidth: 240
+    },
+    GridListLeft: {
+        transform: 'translateZ(0)',
+        cursor: 'pointer',
+        margin: '0%'
     },
 
     title: {
         color: theme.palette.primary.light,
-        margin: theme.spacing.unit,
+    }
+});
 
-    },
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: 200,
-
-    },
-
-}));
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-    PaperProps: {
-        style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-        },
-    },
-};
+class Home extends Component {
 
 
+    constructor() {
+        super();
+        this.state = {
+            movieName: "",
+            upcomingMovies: [],
+            releasedMovies: [],
+            genres: [],
+            artists: [],
+            genresList: genres,
+            artistsList: artists,
+            releaseDateStart: "",
+            releaseDateEnd: ""
+        }
+    }
 
-export function MovieFilter({ setSearch, handleSubmit, setArtist }) {
-    const classes = useStyles();
-    const [artistName, setArtistName] = React.useState([]);
-    const [genres, setGenres] = React.useState([]);
+    movieNameChangeHandler = event => {
+        this.setState({ movieName: event.target.value });
+      }
 
-    const handleChange = (event) => {
-        setArtistName(event.target.value);
-    };
-// console.log(artistName);
+genreSelectHandler = event => {
+    this.setState({ genres: event.target.value });
+  }
+  
+  artistSelectHandler = event => {
+    this.setState({ artists: event.target.value });
+  }
+  
+  releaseDateStartHandler = event => {
+    this.setState({ releaseDateStart: event.target.value });
+  }
+  
+  releaseDateEndHandler = event => {
+    this.setState({ releaseDateEnd: event.target.value });
+  }
 
-    // search the movies ---------------------------------------------------------------------------------
-
-
-
-
-    return (
-
-        <Card className={classes.root}>
-            <label className={classes.title}>FIND MOVIES BY:</label>
-            <FormControl className={classes.root}>
-                <form className={classes.root} noValidate autoComplete="off">
-                    <TextField id="standard-basic" label="Movie Name" onChange={(e) => setSearch(e.target.value)} />
-                </form>
-
+  movieClickHandler = (movieId) => {
+    ReactDOM.render(<Details movieId={movieId} />, document.getElementById('root'));
+}
+    render() {
+        const { classes } = this.props;
+        var filterMovie=moviesData.filter((movie)=>{
+            return(movie.title=== this.state.movieName ||this.state.artists.includes( (movie.artists[0].first_name+" "+movie.artists[0].last_name)))
+          })
+        if(this.state.movieName.length === 0  && this.state.artists.length === 0){
+              filterMovie=moviesData;
+            }
+        
+        return (
+            <div>
+                <Header/>
+                <div id="upcoming-movies">
+                    <span>Upcoming Movies</span>
+                </div>
                 <div>
-                    <FormControl className={classes.formControl}>
-                        <InputLabel id="demo-mutiple-checkbox-label">Genres</InputLabel>
-                        <Select
-                            labelId="demo-mutiple-checkbox-label"
-                            id="demo-mutiple-checkbox"
-                            multiple
-                            value={genres}
-                            onChange={(e) => setGenres(e.target.value)}
-                            input={<Input />}
-                            renderValue={(selected) => selected.join(', ')}
-                            MenuProps={MenuProps}
-                        >
-                            {genre.map((name) => (
-                                <MenuItem key={name.name} value={name.name}>
-                                    <Checkbox checked={genres.indexOf(name.name) > -1} />
-                                    <ListItemText primary={name.name} />
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                <GridList cols={5} className={classes.gridListUpcomingMovies}>
+                        {moviesData.map((tile) => (
+                            <GridListTile key={tile.id} className="poster-grid" >
+                                <img
+                                    src={tile.poster_url}
+                                    alt={tile.title}
+                                    className="movie-poster"
+                                />
+                                <GridListTileBar title={tile.title} />
+                            </GridListTile>
+                        ))}
+                    </GridList>
                 </div>
-
-                <div>
-                    <FormControl className={classes.formControl}>
-                        <InputLabel id="demo-mutiple-checkbox-label">Artists</InputLabel>
-                        <Select
-
-                            labelId="demo-mutiple-checkbox-label"
-                            id="demo-mutiple-checkbox"
-                            multiple
-                            value={artistName}
-                            onChange={handleChange}
-                            input={<Input />}
-                            renderValue={(selected) => selected.join(', ')}
-                            MenuProps={MenuProps}
-                        >
-                            {artists.map((name) => (
-                                <MenuItem key={name.first_name} value={name.first_name}>
-                                    <Checkbox checked={artistName.indexOf(name.first_name) > -1} />
-                                    <ListItemText primary={name.first_name} />
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </div>
-
-                <div>
-                    <FormControl className={classes.formControl}>
-                        <TextField
-                            id="date"
-                            label="Release Date Start"
-                            type="date"
-                            className={classes.textField}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                    </FormControl>
-                </div>
-
-                <div>
-                    <FormControl className={classes.formControl}>
-                        <TextField
-                            id="date"
-                            label="Release Date End"
-                            type="date"
-                            className={classes.textField}
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                    </FormControl>
-                </div>
-                <div className={classes.root}>
-                    <Button className={classes.formControl} variant="contained" color="primary" >Apply</Button>
-                </div>
+<div className="flex-container">
+<div className="left">
+<GridList cols={5} cellHeight={350} className={classes.releasedMovies}>
+{filterMovie.map((movie) => (
+<GridListTile  onClick={() => this.movieClickHandler(movie.id)} className="released-movie-grid-item" key={"grid" + movie.id}>
+ <img
+        src={movie.poster_url}
+        alt={movie.title}
+     className="movie-poster" />
+ <GridListTileBar title={movie.title} subtitle={<span>Release date : 
+                        {new Date(filterMovie.release_date).toDateString }
+                        </span>}/></GridListTile>))}
+</GridList>
+</div>
 
 
-            </FormControl>
+<div className="right">
+<Card>
+    <CardContent>
+        <FormControl className={classes.formControl}>
+            <Typography className={classes.title}>FIND MOVIES BY :</Typography>
+        </FormControl>
 
 
-        </Card>
-    );
+    <FormControl className={classes.formControl}>
+    <InputLabel htmlFor="movieName">Movie Name</InputLabel>
+        <Input id="movieName" onChange={this.movieNameChangeHandler}/>
+    </FormControl>
+
+    <FormControl className={classes.formControl}>
+    <InputLabel htmlFor="select-multiple-checkbox">genres</InputLabel>
+        <Select multiple
+        input={<Input id="select-multiple-checkbox-genre" />}
+        renderValue = {selected => selected.join(",")}
+        value={this.state.genres}
+        onChange={this.genreSelectHandler}
+         >
+        <MenuItem value="0">None</MenuItem>
+            {
+            genres.map(genre => 
+                <MenuItem key={genre.id} value={genre.name}>
+                <Checkbox checked={this.state.genres.indexOf(genre.name) > -1} />
+                <ListItemText primary={genre.name} />
+                </MenuItem>
+                )
+            }
+        </Select>
+    </FormControl>
+
+
+    <FormControl className={classes.formControl}>
+    <InputLabel htmlFor="select-multiple-checkbox">Artists</InputLabel>
+    <Select multiple
+        input={<Input id="select-multiple-checkbox" />}
+        renderValue={selected => selected.join(',')}
+        value={this.state.artists}
+        onChange={this.artistSelectHandler}>
+    <MenuItem value="0">None</MenuItem>
+        {artists.map(artist => (
+        <MenuItem key={artist.id} value={artist.first_name + " " + artist.last_name}>
+        <Checkbox checked={this.state.artists.indexOf(artist.first_name + " " + artist.last_name) > -1} />
+        <ListItemText primary={artist.first_name + " " + artist.last_name} />
+    </MenuItem>))}
+    </Select>
+    </FormControl>
+
+
+    <FormControl className={classes.formControl}>
+    <TextField
+     id="releaseDateStart"
+     label="Release Date Start"
+     type="date"
+     defaultValue=""
+     InputLabelProps={{ shrink: true }}/>
+    </FormControl>
+
+    <FormControl className={classes.formControl}>
+    <TextField
+     id="releaseDateEnd"
+     label="Release Date End"
+     type="date"
+     defaultValue=""
+     InputLabelProps={{ shrink: true }}/>
+    </FormControl>
+
+    <br /><br />
+
+ <FormControl className={classes.formControl}>
+ <Button  variant="contained" color="primary"> APPLY </Button>
+ </FormControl>
+
+
+    </CardContent>
+</Card>
+
+</div>
+</div>
+</div>
+);
+}
 }
 
-
-
-
-
-
-export default Home;
+export default withStyles(styles)(Home);

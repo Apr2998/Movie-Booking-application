@@ -1,23 +1,20 @@
-.headerCSS{
-  background-color: #222;
+.header{
+  background-color:  #222;
   height: 36px;
   padding: 8px 32px 8px 16px;
 }
-#logo{
-  height: 35px;
-  background-color: #ff7f7f;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 8s linear infinite;
+.App-logo{
+  background: #ff7f7f;
 }
-
-
-
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+.App-logo {
+animation: logospin 8s infinite linear;
 }
+@keyframes logospin { 
+  from{
+      transform: rotate(0deg);
+  }
+  to {
+      transform: rotate(360deg);
+  }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
